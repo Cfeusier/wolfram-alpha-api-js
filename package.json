@@ -4,7 +4,7 @@
   "description": "JavaScript library bindings for Wolfram|Alpha web-service API",
   "author": "Clark Feusier <cfeusier@gmail.com>",
   "license": "MIT",
-  "main": "dist/wolfram-alpha-api-js.min.js",
+  "main": "src/index.js",
   "dependencies": {},
   "devDependencies": {
     "browserify": "^13.1.0",
