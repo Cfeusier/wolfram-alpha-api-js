@@ -5,7 +5,17 @@
   "author": "Clark Feusier <cfeusier@gmail.com>",
   "license": "MIT",
   "main": "src/index.js",
-  "dependencies": {},
+  "scripts": {
+    "test": "node test/index.js",
+    "build": "grunt build"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "cheerio": "^0.22.0",
+    "popsicle": "^8.2.0",
+    "traverse": "^0.6.6",
+    "xml2js": "^0.4.17"
+  },
   "devDependencies": {
     "browserify": "^13.1.0",
     "grunt": "^0.4.5",
