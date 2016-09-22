@@ -10,7 +10,7 @@ const $walk = require('traverse')
 // Default Messages and Query Options
 const setAppIdCmd = 'export WA_APP_ID="<YOUR KEY HERE>"'
 const setAppIdError = 'The Wolfram|Alpha API will not work without your APP_ID'
-const noAppIdError = `${setAppIdError}. Before reinitializing wajs, run '${setAppIdCmd}'.`
+const noAppIdError = setAppIdError + '. Before reinitializing wajs, run ' + setAppIdCmd + '.'
 const defaultQueryOptions = {
   url: 'http://api.wolframalpha.com/v2/query',
   method: 'GET',
