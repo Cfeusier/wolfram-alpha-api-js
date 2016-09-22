@@ -51,6 +51,29 @@ function liftAttributes(obj) {
   return lift(Object.assign({}, obj))
 }
 
+function pod(data) {
+  return Object.assign(this, data)
+}
+
+function podFailed() {
+  return this.error === 'true'
+}
+
+function podSucceeded() {
+  return !podFailed.call(this)
+}
+
+function numSubPods() {
+  return Number(this.numsubpods || 0)
+}
+
+pod.prototype = {
+  constructor: pod,
+  failed: podFailed,
+  succeeded: podSucceeded,
+  numSubPods: numSubPods
+}
+
 function queryResult(xml, rawXml) {
   if (!xml || !xml.queryresult) {
     throw new Error('Invalid query result format')
@@ -58,7 +81,9 @@ function queryResult(xml, rawXml) {
   this.__xml = xml
   this.__raw = rawXml || ''
   this.__root = liftAttributes(Object.assign({}, xml.queryresult))
-  this.__pods = this.__root.pod || []
+  this.__pods = (this.__root.pod || []).map(function(_pod) {
+    return new pod(_pod)
+  })
 }
 
 function toJson() {
