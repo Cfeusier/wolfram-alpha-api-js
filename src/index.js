@@ -1,25 +1,21 @@
 'use strict'
 
+// Hard dependencies
 const $net = require('popsicle')
 const $parseXML = (new require('xml2js').Parser()).parseString
 const $ = require('cheerio')
 const $promise = require('bluebird')
 const $walk = require('traverse')
 
-function wajs(appId) {
-  if (!appId || !appId.length) {
-    throw new Error('wajs must be initialized with your APP_ID')
-  }
-  this.appId = appId
-  this.__requestOptions = {
-    url: 'http://api.wolframalpha.com/v2/query',
-    method: 'GET',
-    query: {
-      appid: appId
-    },
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    }
+// Default Messages and Query Options
+const setAppIdCmd = 'export WA_APP_ID="<YOUR KEY HERE>"'
+const setAppIdError = 'The Wolfram|Alpha API will not work without your APP_ID'
+const noAppIdError = `${setAppIdError}. Before reinitializing wajs, run '${setAppIdCmd}'.`
+const defaultQueryOptions = {
+  url: 'http://api.wolframalpha.com/v2/query',
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
   }
 }
 
@@ -51,10 +47,6 @@ function liftAttributes(obj) {
   return lift(Object.assign({}, obj))
 }
 
-function pod(data) {
-  return Object.assign(this, data)
-}
-
 function podFailed() {
   return this.error === 'true'
 }
@@ -67,23 +59,62 @@ function numSubPods() {
   return Number(this.numsubpods || 0)
 }
 
-pod.prototype = {
-  constructor: pod,
-  failed: podFailed,
-  succeeded: podSucceeded,
-  numSubPods: numSubPods
+function podTitle() {
+  return this.title || ''
 }
 
-function queryResult(xml, rawXml) {
-  if (!xml || !xml.queryresult) {
-    throw new Error('Invalid query result format')
+function podScanner() {
+  return this.scanner || ''
+}
+
+function podPosition() {
+  return Number(this.position || 0)
+}
+
+function podAsyncUrl() {
+  return this.asynchurl || ''
+}
+
+function podSubPods(xmlFormat) {
+  if (!!xmlFormat) {
+    return subPodRawXml.call(this)
   }
-  this.__xml = xml
-  this.__raw = rawXml || ''
-  this.__root = liftAttributes(Object.assign({}, xml.queryresult))
-  this.__pods = (this.__root.pod || []).map(function(_pod) {
-    return new pod(_pod)
+  return (this.subpod || []).map(function(subpod) {
+    return new subPod(subpod)
   })
+}
+
+function getXmlCollection(key) {
+  if (key === 'subpod') {
+    var __xml = $.load(this.rawXml.call(this), xmlOptions())
+    var __podXml = $.load(__xml.root().get(0).children[0], xmlOptions())
+    var items = []
+    __podXml(key).each(function(i, el) {
+      var x = $.load($(el).get(0), xmlOptions()).xml() || ''
+      items.push(x)
+    })
+    return items
+  } else if (key === 'pod') {
+    var __xml = $.load(this.__parent.rawXml.call(this.__parent), xmlOptions())
+    var __id = this.id
+    var __filtered = __xml(key).filter(function(i, el) {
+      return $(el).attr('id') === __id
+    })
+    var items = []
+    __filtered.each(function(i, el) {
+      var x = $.load($(el).get(0), xmlOptions()).xml() || ''
+      items.push(x)
+    })
+    return items
+  }
+}
+
+function podRawXml() {
+  return getXmlCollection.call(this, 'pod')
+}
+
+function subPodRawXml() {
+  return getXmlCollection.call(this, 'subpod')
 }
 
 function toJson() {
@@ -136,9 +167,9 @@ function xmlOptions() {
   return { xmlMode: true }
 }
 
-function getNodes(key) {
+function getNodes(key, xml) {
   var __stack = []
-  var __xml = $.load(this.__raw, xmlOptions())
+  var __xml = !!xml ? xml : $.load(this.__raw, xmlOptions())
   traverse(__stack, __xml.root(), collect.bind(this, key))
   return __stack.map(function(_node) {
     return $.load(_node, xmlOptions()).xml()
@@ -173,21 +204,6 @@ function warnings(xmlFormat) {
   return this.__root.warnings
 }
 
-queryResult.prototype = {
-  constructor: queryResult,
-  rawXml: rawXml,
-  toJson: toJson,
-  succeeded: succeeded,
-  failed: failed,
-  numPods: numPods,
-  dataTypes: dataTypes,
-  error: error,
-  pods: pods,
-  assumptions: assumptions,
-  sources: sources,
-  warnings: warnings
-}
-
 function processQueryResponse(y, n, res) {
   if (res.status >= 200 && res.status < 400) {
     $parseXML(res.body, function(err, xml) {
@@ -207,6 +223,75 @@ function query(input, queryOptions) {
     .then(processQueryResponse.bind(this, y, n))
     .catch(n)
   }.bind(this))
+}
+
+// Constructors and prototypes
+function subPod(data) {
+  return Object.assign(this, data)
+}
+
+subPod.prototype = {
+  constructor: subPod
+}
+
+function pod(data, parent) {
+  Object.assign(this, data)
+  if (!!parent) {
+    this.__parent = parent
+  }
+  this.__data = data
+}
+
+pod.prototype = {
+  constructor: pod,
+  failed: podFailed,
+  succeeded: podSucceeded,
+  numSubPods: numSubPods,
+  getTitle: podTitle,
+  getScanner: podScanner,
+  getPosition: podPosition,
+  asyncEndpoint: podAsyncUrl,
+  subPods: podSubPods,
+  rawXml: podRawXml
+}
+
+function queryResult(xml, rawXml) {
+  if (!xml || !xml.queryresult) {
+    throw new Error('Invalid query result format')
+  }
+  this.__xml = xml
+  this.__raw = rawXml || ''
+  this.__root = liftAttributes(Object.assign({}, xml.queryresult))
+  this.__pods = (this.__root.pod || []).map(function(_pod) {
+    return new pod(_pod, this)
+  }.bind(this))
+}
+
+queryResult.prototype = {
+  constructor: queryResult,
+  rawXml: rawXml,
+  toJson: toJson,
+  succeeded: succeeded,
+  failed: failed,
+  numPods: numPods,
+  dataTypes: dataTypes,
+  error: error,
+  pods: pods,
+  assumptions: assumptions,
+  sources: sources,
+  warnings: warnings
+}
+
+function wajs(appId) {
+  if (!appId || !appId.length) {
+    throw new Error(noAppIdError)
+  }
+  var q = {
+    query: {
+      appid: appId
+    }
+  }
+  this.__requestOptions = Object.assign({}, defaultQueryOptions, q)
 }
 
 wajs.prototype = {
