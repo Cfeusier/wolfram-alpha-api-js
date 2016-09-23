@@ -27,6 +27,15 @@ function generateQuery(input, options) {
   if (options.async) {
     q.query.async = true
   }
+  if (options.podTitle) {
+    q.query.podtitle = options.podTitle
+  }
+  if (options.podIndex) {
+    q.query.podindex = options.podIndex
+  }
+  if (options.format) {
+    q.query.format = options.format
+  }
   return q
 }
 
@@ -77,44 +86,82 @@ function podAsyncUrl() {
 
 function podSubPods(xmlFormat) {
   if (!!xmlFormat) {
-    return subPodRawXml.call(this)
+    return childXml.call(this, 'subpod')
   }
   return (this.subpod || []).map(function(subpod) {
     return new subPod(subpod)
   })
 }
 
-function getXmlCollection(key) {
-  if (key === 'subpod') {
-    var __xml = $.load(this.rawXml.call(this), xmlOptions())
-    var __podXml = $.load(__xml.root().get(0).children[0], xmlOptions())
-    var items = []
-    __podXml(key).each(function(i, el) {
-      var x = $.load($(el).get(0), xmlOptions()).xml() || ''
-      items.push(x)
-    })
-    return items
-  } else if (key === 'pod') {
-    var __xml = $.load(this.__parent.rawXml.call(this.__parent), xmlOptions())
-    var __id = this.id
-    var __filtered = __xml(key).filter(function(i, el) {
-      return $(el).attr('id') === __id
-    })
-    var items = []
-    __filtered.each(function(i, el) {
-      var x = $.load($(el).get(0), xmlOptions()).xml() || ''
-      items.push(x)
-    })
-    return items
+function subPodPlainText() {
+  return this.plaintext || ''
+}
+
+function subPodImg() {
+  return this.img || ''
+}
+
+function assumptionType() {
+  return this.type || ''
+}
+
+function assumptionCount() {
+  return this.count || '0'
+}
+
+function assumptionTemplate() {
+  return this.template || ''
+}
+
+function assumptionWord() {
+  return this.word || ''
+}
+
+function assumptionValue() {
+  return this.value || []
+}
+
+function podStates(xmlFormat) {
+  if (!!xmlFormat) {
+    return childXml.call(this, 'states')
   }
+  return this.states || []
+}
+
+function podInfos(xmlFormat) {
+  if (!!xmlFormat) {
+    return childXml.call(this, 'infos')
+  }
+  return this.infos || []
+}
+
+function rootXml(key) {
+  var __xml = $.load(this.__parent.rawXml.call(this.__parent), xmlOptions())
+  var __id = this.id
+  var __filtered = __xml(key).filter(function(i, el) {
+    return $(el).attr('id') === __id
+  })
+  var items = []
+  __filtered.each(function(i, el) {
+    var x = $.load($(el).get(0), xmlOptions()).xml() || ''
+    items.push(x)
+  })
+  return items
+}
+
+function childXml(key) {
+  var __xml = $.load(this.rawXml.call(this), xmlOptions())
+  var __podXml = $.load(__xml.root().get(0).children[0], xmlOptions())
+  var items = []
+  __podXml(key).each(function(i, el) {
+    var x = $.load($(el).get(0), xmlOptions()).xml() || ''
+    items.push(x)
+  })
+  return items
 }
 
 function podRawXml() {
-  return getXmlCollection.call(this, 'pod')
-}
-
-function subPodRawXml() {
-  return getXmlCollection.call(this, 'subpod')
+  return rootXml.call(this, 'pod')
 }
 
 function toJson() {
@@ -187,7 +234,9 @@ function assumptions(xmlFormat) {
   if (!!xmlFormat) {
     return getNodes.call(this, 'assumptions')
   }
-  return this.__root.assumptions
+  return (this.__root.assumptions || []).map(function(_assumption) {
+    return new assumption(_assumption.assumption[0], this)
+  }.bind(this))
 }
 
 function sources(xmlFormat) {
@@ -231,7 +280,27 @@ function subPod(data) {
 }
 
 subPod.prototype = {
-  constructor: subPod
+  constructor: subPod,
+  getTitle: podTitle,
+  getPlainText: subPodPlainText,
+  getImg: subPodImg
+}
+
+function assumption(data, parent) {
+  Object.assign(this, data)
+  if (!!parent) {
+    this.__parent = parent
+  }
+  this.__data = data
+}
+
+assumption.prototype = {
+  constructor: assumption,
+  getType: assumptionType,
+  getCount: assumptionCount,
+  getTemplate: assumptionTemplate,
+  getWord: assumptionWord,
+  getValue: assumptionValue
 }
 
 function pod(data, parent) {
@@ -252,6 +321,8 @@ pod.prototype = {
   getPosition: podPosition,
   asyncEndpoint: podAsyncUrl,
   subPods: podSubPods,
+  getStates: podStates,
+  getInfos: podInfos,
   rawXml: podRawXml
 }
 
