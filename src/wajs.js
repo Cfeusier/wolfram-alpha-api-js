@@ -1,5 +1,7 @@
 'use strict'
 
+require('babel-polyfill')
+
 const constants = require('./constants')
 
 function wajs(appId) {
