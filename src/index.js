@@ -36,6 +36,24 @@ function generateQuery(input, options) {
   if (options.format) {
     q.query.format = options.format
   }
+  if (options.includePodId) {
+    q.query.includepodid = options.includePodId
+  }
+  if (options.excludePodId) {
+    q.query.excludepodid = options.excludePodId
+  }
+  if (options.scanner) {
+    q.query.scanner = options.scanner
+  }
+  if (options.ip) {
+    q.query.ip = options.ip
+  }
+  if (options.location) {
+    q.query.location = options.location
+  }
+  if (options.coordinates) {
+    q.query.latlong = options.coordinates
+  }
   return q
 }
 

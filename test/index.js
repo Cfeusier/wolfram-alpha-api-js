@@ -8,7 +8,15 @@ let wa = new wajs(id)
 let qOpts = {
   // podTitle: 'Decimal approximation,...,*'
   // podIndex: '1,...'
-  format: 'image,plaintext,minput,moutput,cell,mathml,imagemap,sound,wav'
+  // format: 'image,plaintext,minput,moutput,cell,mathml,imagemap,sound,wav'
+  // includePodId: ['*'] || '*'
+  // excludePodId: ['Number Line', '*n'] || '*'
+  // scanner: ['MathematicalFunctionData', 'Numeric'] || '*'
+  // async: true
+  // ip: '73.223.60.171'
+  // location: 'CA'
+  // coordinates: '40.42,-3.71'
+
 }
 wa.query('pi', qOpts)
 .then(function(res) {
