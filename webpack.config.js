@@ -30,7 +30,7 @@ const config = {
     umdNamedDefine: true
   },
   target: 'node',
-  externals: [$nodeExternals({ whitelist: ['babel-polyfill'] })],
+  externals: [$nodeExternals({ whitelist: [/^babel-*/] })],
   module: {
     loaders: [
       {
