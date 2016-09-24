@@ -13,11 +13,12 @@
 
 1. [Overview](#overview)
 1. [Dependencies](#dependencies)
-
-<!--
 1. [Installation](#installation)
 1. [Documentation](#documentation)
+    1. [Example Usage](#example-usage)
     1. [API Reference](#api-reference)
+
+<!--
 1. [Roadmap](#roadmap)
 1. [Contributing](#contributing-to-jkif-parser)
 1. [Development Requirements](#development-requirements)
@@ -41,88 +42,162 @@
 
 ---
 
-<!--
-
 ## Installation
 
-**jKif Parser** is available as an npm package.
+**wajs** is available as an npm package.
+
+<sub>* Note: Wolfram|Alpha does not support CORS for serving browser requests. <strong>wajs</strong> is only available in the Node environment until client-side requests are supported by the Wolfram|Alpha API.</sub>
 
 ***Install module from command-line***
 
 ```sh
-npm install jkif-parser
+npm install wajs
 ```
 
-***Require module for use in desired file***
+***Require or import module for use in desired file***
 
 ```js
-var jkParser = require('jkif-parser');
+// commonjs require
+var wajs = require('wajs')
+```
+
+```js
+// es2015 import
+import wajs from 'wajs'
 ```
 
 ---
 
 ## Documentation
 
-### *jKif Parser*
-
-This object provides an object-oriented API for parsing SUO-KIF into JavaScript, as well as utility methods for handling the parsed output.
+### Example Usage
 
 ```js
-var Parser = require('jkif-parser');
+// require wajs module -- assuming commonjs/node environment
+var wajs = require('wajs')
+
+// the Wolfram|Alpha App Id -- generated in Wolfram|Alpha developer portal
+// NOTE: copy your app id and set your WA_APP_ID environment variable
+// from the command-line, as follows:
+// `export WA_APP_ID='<YOUR APP ID GOES HERE>'`
+var waAppId = process.env.WA_APP_ID
+
+// create a client to query the Wolfram|Alpha web-service
+// NOTE: you can create as many clients as you want, though you only need one
+var waClient = new wajs(waAppId)
+
+// the only required argument to `<wajs-client>.query` is a query string
+var queryString = 'weather' // maybe this comes from user input
+
+// if you want to customize the query further, provide query options
+// for documentation on query options, please see
+// the API Reference for `<wajs-client>.query`
+// NOTE: this is an optional argument
+var queryOptions = {
+  format: 'image,plaintext,sound,wav',
+  units: 'metric'
+}
+
+// use the client to send a query
+waClient.query(queryString, queryOptions)
+.then(function(resp) {
+  // do something with the `<query-result>` response
+  // for documentation on `<query-result>`, please see
+  // the API reference for `<query-result>`
+})
+.catch(function(err) {
+  // do something with the `<query-error>` response
+})
 ```
 
 ### API Reference
 
-- [**`parse`**](#parse)
-- [**`parseFile`**](#parseFile)
-- [**`parseFileP`**](#parseFileP)
-- [**`writeParsedToFile`**](#writeParsedToFile)
-- [**`writeParsedToFileP`**](#writeParsedToFileP)
+- [**`wajs`**](#wajs)
+- [**`<wajs-client>.query`**](#query)
+  - [**`options`**](#options)
 
-#### parse
+#### wajs
 
-#### `parse(suoKif: string): KIFNode<T>`
+#### `new wajs(appId: string): wajs-client<T>`
 
-Synchronously parses string of SUO-KIF into an Abstract Syntax Tree represented by a JavaScript `KIFNode`.
+This is the constructor function for generating a `<wajs-client>`.
+
+- `appId`:
+  - *required*
+  - type: string
+  - [Obtain an appId from Wolfram|Alpha](http://products.wolframalpha.com/api/)
+
+#### \<wajs-client>.query
+
+#### `<wajs-client>.query(input: string, options: object): Promise<T>`
+
+This method allows will query the Wolfram|Alpha web-service API with the provided query.
+
+- `input`:
+  - *required*
+  - type: string
+- `options`:
+  - _optional_
+  - type: object
+  - [API Reference for options](#options)
 
 ```js
-Parser.parse('(instance ?FIDDLE Dog)');
+waClient.query('pi', {
+  assumption: '*C.pi-_*Movie-',
+  format: 'image,plaintext,sound,wav'
+})
+.then(function(qr) {
+  // qr === <query-result>
+})
+.catch(function(err) {})
+```
 
-// Output JavaScript AST
-{
-  type: 'KIFNode',
-  locationData: {
-    first_line: 1,
-    last_line: 1,
-    first_column: 0,
-    last_column: 22
-  },
-  expressions: [
-    {
-      type: 'RelSentNode',
-      locationData: { ... },
-      constant: {
-        type: 'WordNode',
-        locationData: { ... },
-        word: 'instance'
-      },
-      argumentList: [
-        {
-          type: 'VariableNode',
-          locationData: { ... },
-          variableType: 'IND',
-          variableName: 'FIDDLE'
-        },
-        {
-          type: 'WordNode',
-          locationData: { ... },
-          word: 'Dog'
-        }
-      ]
-    }
-  ]
+#### options
+
+```js
+var queryOptions = {
+  // repeatable, globable, comma-separated
+  // default: all pod titles
+  podTitle: '',
+
+  // repeatable, globable, comma-separated
+  // default: all pod indices
+  podIndex: '',
+
+  // repeatable, comma-separated
+  // default: 'image,plaintext'
+  // possible options:
+    // image
+    // plaintext
+    // minput
+    // moutput
+    // cell
+    // mathml
+    // imagemap
+    // sound
+    // wav
+  format: '',
+  ...
 }
 ```
+
+<!--
+
+
+  // includePodId: ['*'], // || '*'
+  // excludePodId: ['Number Line', '*n'] || '*'
+  // scanner: ['MathematicalFunctionData', 'Numeric'] || '*'
+  // async: true
+  // ip: '73.223.60.171',
+  // location: 'CA',
+  // coordinates: '40.42,-3.71',
+  // assumption: '*C.pi-_*Character-',
+  // podState: 'AlternativeRepresentations:MathematicalFunctionIdentityData__More'
+  // units: 'metric' // || 'nonmetric'
+  // width: '200', // (500)
+  // maxWidth: '', // (500)
+  // plotWidth: '200', // (200)
+  // magnitude: '4.0', // (1.0)
 
 #### parseFile
 
