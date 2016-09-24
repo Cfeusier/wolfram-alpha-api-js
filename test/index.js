@@ -6,21 +6,33 @@ let id = process.env.WA_APP_ID || ''
 
 let wa = new wajs(id)
 let qOpts = {
-  // podTitle: 'Decimal approximation,...,*'
+  // podTitle: 'Decimal approximation',
   // podIndex: '1,...'
-  // format: 'image,plaintext,minput,moutput,cell,mathml,imagemap,sound,wav'
-  // includePodId: ['*'] || '*'
+  // format: 'image,plaintext,minput,moutput,cell,mathml,imagemap,sound,wav',
+  // includePodId: ['*'], // || '*'
   // excludePodId: ['Number Line', '*n'] || '*'
   // scanner: ['MathematicalFunctionData', 'Numeric'] || '*'
   // async: true
-  // ip: '73.223.60.171'
-  // location: 'CA'
-  // coordinates: '40.42,-3.71'
+  // ip: '73.223.60.171',
+  // location: 'CA',
+  // coordinates: '40.42,-3.71',
+  // assumption: '*C.pi-_*Character-',
+  // podState: 'AlternativeRepresentations:MathematicalFunctionIdentityData__More'
+  // units: 'metric' // || 'nonmetric'
+  // width: '200', // (500)
+  // maxWidth: '', // (500)
+  // plotWidth: '200', // (200)
+  // magnitude: '4.0', // (1.0)
 
 }
 wa.query('pi', qOpts)
 .then(function(res) {
-  console.log(res)
+  // res.assumptions().forEach(function(assumption) {
+  //   assumption.getValue().forEach(function(value) {
+  //     console.log(value)
+  //   })
+  // })
+  console.log(res.pods())
   // console.log(res.toJson())
   // console.log(res.rawXml())
   // res.succeeded()

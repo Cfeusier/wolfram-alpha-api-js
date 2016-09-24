@@ -1,7 +1,7 @@
 {
   "name": "wajs",
   "version": "0.0.6",
-  "description": "JavaScript library bindings for Wolfram|Alpha web-service API",
+  "description": "JavaScript bindings for Wolfram|Alpha web-service API",
   "author": "Clark Feusier <cfeusier@gmail.com>",
   "license": "MIT",
   "main": "src/index.js",
