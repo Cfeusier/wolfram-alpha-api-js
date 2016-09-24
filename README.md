@@ -12,7 +12,6 @@
 ---
 
 1. [Overview](#overview)
-1. [Dependencies](#dependencies)
 1. [Installation](#installation)
 1. [Documentation](#documentation)
     1. [Example Usage](#example-usage)
@@ -25,20 +24,13 @@
     1. [Installing Dependencies](#installing-dependencies)
     1. [Running Tests](#running-tests)
 1. [License](#license)
+1. [Dependencies](#dependencies)
 1. [Appendix](#appendix) -->
 
 ---
 ## Overview
 
 ...
-
-#### Dependencies
-
-- [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) &mdash; parses XML to JavaScript objects
-- [bluebird](https://github.com/petkaantonov/bluebird) &mdash; creates a Promise-interface for query methods
-- [cheerio](https://github.com/cheeriojs/cheerio) &mdash; simple server-side DOM utility library
-- [popsicle](https://github.com/blakeembrey/popsicle) &mdash; utility for making server and browser HTTP requests
-- [traverse](https://github.com/substack/js-traverse) &mdash; utility for traversing JavaScript objects
 
 ---
 
@@ -333,6 +325,16 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+#### Dependencies
+
+- [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) &mdash; parses XML to JavaScript objects
+- [bluebird](https://github.com/petkaantonov/bluebird) &mdash; creates a Promise-interface for query methods
+- [cheerio](https://github.com/cheeriojs/cheerio) &mdash; simple server-side DOM utility library
+- [popsicle](https://github.com/blakeembrey/popsicle) &mdash; utility for making server and browser HTTP requests
+- [traverse](https://github.com/substack/js-traverse) &mdash; utility for traversing JavaScript objects
 
 ---
 
