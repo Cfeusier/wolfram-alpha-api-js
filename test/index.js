@@ -1,6 +1,6 @@
 'use strict'
 
-const wajs = require('../src/index')
+const wajs = require('../dist/wajs.min.js')
 
 let id = process.env.WA_APP_ID || ''
 

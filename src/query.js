@@ -2,7 +2,8 @@
 
 const $net = require('popsicle')
 const $promise = require('bluebird')
-const $parseXML = (new require('xml2js').Parser()).parseString
+const $x = require('xml2js')
+const $parseXML = new $x.Parser().parseString
 const constants = require('./constants')
 const queryResult = require('./query_result')
 
