@@ -4,7 +4,7 @@
   "description": "JavaScript bindings for Wolfram|Alpha web-service API",
   "author": "Clark Feusier <cfeusier@gmail.com>",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "dist/wajs.min.js",
   "scripts": {
     "test": "node test/index.js",
     "clean": "rm -rf ./dist/*",
