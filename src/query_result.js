@@ -1,8 +1,9 @@
 'use strict'
 
-const pod = require('./pod')
-const $ = require('cheerio')
-const $walk = require('traverse')
+import * as $ from 'cheerio'
+import $walk from 'traverse'
+import pod from './pod'
+import assumption from './assumption'
 
 function queryResult(xml, rawXml) {
   if (!xml || !xml.queryresult) {
@@ -31,7 +32,7 @@ queryResult.prototype = {
   warnings: warnings
 }
 
-module.exports = queryResult
+export default queryResult
 
 function liftAttributes(obj) {
   return lift(Object.assign({}, obj))

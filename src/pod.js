@@ -1,6 +1,7 @@
 'use strict'
 
-const $ = require('cheerio')
+import * as $ from 'cheerio'
+import subPod from './subpod'
 
 function pod(data, parent) {
   Object.assign(this, data)
@@ -25,7 +26,7 @@ pod.prototype = {
   rawXml: rawXml
 }
 
-module.exports = pod
+export default pod
 
 function failed() {
   return this.error === 'true'

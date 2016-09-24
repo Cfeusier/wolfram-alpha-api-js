@@ -11,7 +11,7 @@ subPod.prototype = {
   getImg: img
 }
 
-module.exports = subPod
+export default subPod
 
 function plainText() {
   return this.plaintext || ''

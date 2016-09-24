@@ -1,3 +1,7 @@
 'use strict'
 
-module.exports = require('./wajs')
+import 'babel-polyfill'
+
+import wajs from './wajs'
+
+module.exports = wajs

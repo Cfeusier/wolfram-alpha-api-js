@@ -1,8 +1,7 @@
 'use strict'
 
-require('babel-polyfill')
-
-const constants = require('./constants')
+import constants from './constants'
+import query from './query'
 
 function wajs(appId) {
   if (!appId || !appId.length) {
@@ -18,7 +17,7 @@ function wajs(appId) {
 
 wajs.prototype = {
   constructor: wajs,
-  query: require('./query')
+  query: query
 }
 
-module.exports = wajs
+export default wajs

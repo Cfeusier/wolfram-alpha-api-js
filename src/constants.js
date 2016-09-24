@@ -26,8 +26,10 @@ const setAppIdError = 'The Wolfram|Alpha API will not work without your APP_ID'
 
 const noAppIdError = setAppIdError + '. Before reinitializing wajs, run ' + setAppIdCmd + '.'
 
-module.exports = {
+let constants = {
   queryMap: queryMap,
   defaultQueryOptions: defaultQueryOptions,
   noAppIdError: noAppIdError
 }
+
+export default constants

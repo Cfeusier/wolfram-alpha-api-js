@@ -17,7 +17,7 @@ assumption.prototype = {
   getValue: value
 }
 
-module.exports = assumption
+export default assumption
 
 function type() {
   return this.type || ''

@@ -1,11 +1,11 @@
 'use strict'
 
-const $net = require('popsicle')
-const $promise = require('bluebird')
-const $x = require('xml2js')
+import * as $net from 'popsicle'
+import { Promise as $promise } from 'bluebird'
+import * as $x from 'xml2js'
+import constants from './constants'
+import queryResult from './query_result'
 const $parseXML = new $x.Parser().parseString
-const constants = require('./constants')
-const queryResult = require('./query_result')
 
 function generateQuery(input, options) {
   var q = Object.assign({}, this.__requestOptions)
@@ -42,4 +42,4 @@ function query(input, queryOptions) {
   }.bind(this))
 }
 
-module.exports = query
+export default query
