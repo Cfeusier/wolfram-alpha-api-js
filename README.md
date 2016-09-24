@@ -2,7 +2,7 @@
 
 **wajs** provides JavaScript bindings for the [Wolfram|Alpha web-service API](http://products.wolframalpha.com/api/).
 
-[ ![Current Stable Release Version](https://img.shields.io/badge/version-0.0.6-blue.svg)](https://github.com/cfeusier/wolfram-alpha-api-js/releases)
+[ ![Current Stable Release Version](https://img.shields.io/badge/version-0.0.13-blue.svg)](https://github.com/cfeusier/wolfram-alpha-api-js/releases)
 [ ![Current Stable npm Release](https://img.shields.io/badge/npm-install%20wajs-lightgrey.svg)](https://www.npmjs.com/package/wajs)
 
 > <sub>__Created by [Clark Feusier](http://clarkfeusier.com/pages/about)__</sub>
