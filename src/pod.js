@@ -1,6 +1,6 @@
 'use strict'
 
-import * as $ from 'cheerio'
+import $ from 'cheerio'
 import subPod from './subpod'
 
 function pod(data, parent) {

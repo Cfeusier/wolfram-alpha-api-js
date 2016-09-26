@@ -1,6 +1,6 @@
 'use strict'
 
-import * as $ from 'cheerio'
+import $ from 'cheerio'
 import $walk from 'traverse'
 import pod from './pod'
 import assumption from './assumption'

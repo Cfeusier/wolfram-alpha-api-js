@@ -16,16 +16,13 @@
 1. [Documentation](#documentation)
     1. [Example Usage](#example-usage)
     1. [API Reference](#api-reference)
-
-<!--
 1. [Roadmap](#roadmap)
-1. [Contributing](#contributing-to-jkif-parser)
+1. [Contributing](#contributing-to-wajs)
 1. [Development Requirements](#development-requirements)
     1. [Installing Dependencies](#installing-dependencies)
     1. [Running Tests](#running-tests)
+    1. [Building](#building)
 1. [License](#license)
-1. [Dependencies](#dependencies)
-1. [Appendix](#appendix) -->
 
 ---
 ## Overview
@@ -105,8 +102,17 @@ waClient.query(queryString, queryOptions)
 ### API Reference
 
 - [**`wajs`**](#wajs)
-- [**`<wajs-client>.query`**](#query)
+- [**`<wajs-client>.query`**](#wajs-clientquery)
   - [**`options`**](#options)
+- [**`<query-result>`**](#query-result)
+  - [**`<query-result>.succeeded`**](#query-resultsucceeded)
+  - [**`<query-result>.failed`**](#query-resultfailed)
+  - [**`<query-result>.error`**](#query-resulterror)
+  - [**`<query-result>.numPods`**](#query-resultnumpods)
+  - [**`<query-result>.dataTypes`**](#query-resultdatatypes)
+  - [**`<query-result>.toJson`**](#query-resulttojson)
+  - [**`<query-result>.rawXml`**](#query-resultrawxml)
+  - [**`<query-result>.pods`**](#query-resultpods)
 
 #### wajs
 
@@ -123,7 +129,7 @@ This is the constructor function for generating a `<wajs-client>`.
 
 #### `<wajs-client>.query(input: string, options: object): Promise<T>`
 
-This method allows will query the Wolfram|Alpha web-service API with the provided query.
+This method will query the Wolfram|Alpha web-service API with the provided query.
 
 - `input`:
   - *required*
@@ -134,9 +140,21 @@ This method allows will query the Wolfram|Alpha web-service API with the provide
   - [API Reference for options](#options)
 
 ```js
+// query with string and default options
+waClient.query('whatever')
+.then(function(qr) {
+  // qr === <query-result>
+})
+.catch(function(err) {})
+```
+
+```js
+// query with string and custom options
 waClient.query('pi', {
+  format: 'image,plaintext,sound,wav',
   assumption: '*C.pi-_*Movie-',
-  format: 'image,plaintext,sound,wav'
+  width: '900',
+  maxWidth: '1200'
 })
 .then(function(qr) {
   // qr === <query-result>
@@ -148,14 +166,17 @@ waClient.query('pi', {
 
 ```js
 var queryOptions = {
+  // podTitle
   // repeatable, globable, comma-separated
   // default: all pod titles
   podTitle: '',
 
+  // podIndex
   // repeatable, globable, comma-separated
   // default: all pod indices
   podIndex: '',
 
+  // format
   // repeatable, comma-separated
   // default: 'image,plaintext'
   // possible options:
@@ -169,128 +190,313 @@ var queryOptions = {
     // sound
     // wav
   format: '',
-  ...
+
+  // assumption
+  // single string -- must match an assumption string from Wolfram|Alpha assumptions
+  assumption: '',
+
+  // includePodId
+  // list of strings or single string, globable
+  // default: all pod ids
+  includePodId: [], // '',
+
+  // excludePodId
+  // list of strings or single string, globable
+  // default: none are excluded
+  excludePodId: [], // '',
+
+  // scanner
+  // list of strings or single string, globable
+  // default: all scanners
+  scanner: [], // ''
+
+  // async
+  // boolean -- if set to true, results will contain 'async' flags for the
+  // properties that require another request to get content. If you want all the query
+  // results in a single response, do not use the async flag
+  // default: false
+  async: true,
+
+  // ip
+  // string -- should represent the ip address to be used for restricting the query
+  // default: the requesting ip address
+  ip: '',
+
+  // location
+  // string -- should represent the location to be used for
+  // restricting the query, e.g., 'CA'
+  // default: none
+  location: '',
+
+  // coordinates
+  // string -- should represent the latitude and longitude pair
+  // to be used for restricting the query, e.g., '40.42,-3.71'
+  // default: none
+  coordinates: '',
+
+  // podState
+  // string -- should match a pod state string from a Wolfram|Alpha pod
+  // default: none
+  podState: '',
+
+  // units
+  // string
+  // default: based on requesting location
+  // possible options:
+    // 'metric'
+    // 'nonmetric'
+  units: '',
+
+  // width
+  // string
+  // default: '500'
+  width: '',
+
+  // maxWidth
+  // string
+  // default: '500'
+  maxWidth: '',
+
+  // plotWidth
+  // string
+  // default: '200'
+  plotWidth: '',
+
+  // magnitude
+  // string
+  // default: '1.0'
+  magnitude: '',
+
 }
 ```
 
-<!--
+#### \<query-result>
 
+When the promise, returned by `<wajs-client>.query`, _resolves_, the resolution handler function is provided a `<query-result>` instance, with the following API.
 
-  // includePodId: ['*'], // || '*'
-  // excludePodId: ['Number Line', '*n'] || '*'
-  // scanner: ['MathematicalFunctionData', 'Numeric'] || '*'
-  // async: true
-  // ip: '73.223.60.171',
-  // location: 'CA',
-  // coordinates: '40.42,-3.71',
-  // assumption: '*C.pi-_*Character-',
-  // podState: 'AlternativeRepresentations:MathematicalFunctionIdentityData__More'
-  // units: 'metric' // || 'nonmetric'
-  // width: '200', // (500)
-  // maxWidth: '', // (500)
-  // plotWidth: '200', // (200)
-  // magnitude: '4.0', // (1.0)
+#### \<query-result>.succeeded
 
-#### parseFile
+#### `<query-result>.succeeded(): boolean`
 
-#### `parseFile(filePath: string, cb: function): void`
-
-Asynchronously parses a file of SUO-KIF into an Abstract Syntax Tree represented by a JavaScript `KIFNode`, which is then passed to the callback function on invocation.
-
-The callback function will receive two arguments &mdash; an `error` and a `KIFNode` (an AST of the parsed file). The `error` will be null if the parsing was successful.
+This method will return a boolean indicating the success of the query operation (not the success of the overall HTTP request, which is indicated by the query promise resolution).
 
 ```js
-Parser.parseFile('filePathToSomeSUOKIF', function(error, kifNode) {
-  if (!error) {
-    // do something with the kifNode AST
-  }
-});
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.succeeded())
+})
+
+// output
+true
 ```
 
-**N.B.** &mdash; this is a side-effect function, which returns `undefined`.
+#### \<query-result>.failed
 
-#### parseFileP
+#### `<query-result>.failed(): boolean`
 
-#### `parseFileP(filePath: string): Promise<T>`
-
-Asynchronously parses a file of SUO-KIF into an Abstract Syntax Tree represented by a JavaScript `KIFNode`, which is then used as the resolution of the `parseFileP` promise.
-
-To access the output of the parsing, register a `then` handler on the promise.
-
-If the parsing fails, the error can be handled by registering a `catch` handler on the promise.
+This method will return a boolean indicating the failure of the query operation (not the failure of the overall HTTP request, which is indicated by the query promise rejection).
 
 ```js
-Parser.parseFileP('filePathToSomeSUOKIF').then(function(kifNode) {
-  // do something with the kifNode AST
-}).catch(function(error) {
-  // do something with the error if the parsing fails
-});
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.failed())
+})
+
+// output
+false
 ```
 
-#### writeParsedToFile
+#### \<query-result>.error
 
-#### `writeParsedToFile(filePath: string, parsed: KIFNode, cb: function): void`
+#### `<query-result>.error(): { Error, null }`
 
-Asynchronously writes *parsed* SUO-KIF to a file, invoking the supplied callback function with the results of the write operation.
-
-The callback function will receive one argument &mdash; an `error`. The `error` will be null if the parsing was successful.
+This method will return an `Error` object if the query operation failed, and `null` otherwise.
 
 ```js
-var kifString = '(exists (?FIDDLE ?CLARK)
-                    (and
-                      (instance ?FIDDLE Dog)
-                      (loves ?FIDDLE ?CLARK)))';
-var parsed = Parser.parse(kifString);
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.error())
+})
 
-Parser.writeParsedToFile('filePath', parsed, function(error) {
-  if (!error) {
-    // your file should now have the AST in JSON format
-  }
-});
+// output
+null
 ```
 
-**N.B.** &mdash; this is a side-effect function, which returns `undefined`.
+#### \<query-result>.numPods
 
-#### writeParsedToFileP
+#### `<query-result>.numPods(): number`
 
-#### `writeParsedToFileP(filePath: string, parsed: KIFNode): Promise<T>`
-
-Asynchronously writes *parsed* SUO-KIF to a file, returning a promise.
-
-If the write operation is successful, then the promise value will resolve as `null`. If the write operation fails, you can register a `catch` handler function to receive the `error` from the promise resolution.
+This method will return the number of pods in the given query result.
 
 ```js
-var kifString = '(exists (?FIDDLE ?CLARK)
-                    (and
-                      (instance ?FIDDLE Dog)
-                      (loves ?FIDDLE ?CLARK)))';
-var parsed = Parser.parse(kifString);
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.numPods())
+})
 
-Parser.writeParsedToFileP('filePath', parsed).catch(function(error) {
-  // handle the error
-  // if this is not run, the parsed was written to the file successfully
-});
+// output
+8
+```
+
+#### \<query-result>.dataTypes
+
+#### `<query-result>.dataTypes(): array<DataType>`
+
+This method will return a list of `DataType` strings representing the categories and types of data represented in the query result.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.dataTypes())
+})
+
+// output
+['MathematicalFunctionIdentity']
+```
+
+#### \<query-result>.toJson
+
+#### `<query-result>.toJson(): json-string`
+
+This method will convert the entire query result to JSON.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.toJson())
+})
+
+// output (truncated)
+{
+  "pod":[...],
+  "assumptions":[...],
+  "success":"true",
+  "error":"false",
+  "numpods":"8",
+  "datatypes":"MathematicalFunctionIdentity",
+  "timedout":"Numeric",
+  "timedoutpods":"",
+  "timing":"3.4170000000000003",
+  "parsetiming":"0.14",
+  "parsetimedout":"false",
+  "recalculate":"http://www4b.wolframalpha.com/api/v2/recalc.jsp?id=...",
+  "id":"...",
+  "host":"http://www4b.wolframalpha.com",
+  "server":"30",
+  "related":"http://www4b.wolframalpha.com/api/v2/relatedQueries.jsp?id=...",
+  "version":"2.6"
+}
+```
+
+#### \<query-result>.rawXml
+
+#### `<query-result>.rawXml(): xml-string`
+
+This method will return the entire original xml query result.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  console.log(qr.rawXml())
+})
+```
+
+```xml
+<!-- output (truncated) -->
+<?xml version='1.0' encoding='UTF-8'?>
+<queryresult
+  success='true'
+  error='false'
+  numpods='8'
+  ...>
+  <pod title='Input'>...</pod>
+  <assumptions count='1'>...</assumptions>
+</queryresult>
+```
+
+#### \<query-result>.pods
+
+#### `<query-result>.pods(xmlFormat: boolean): array<pod>`
+
+This method return a list of `pod` objects from the query result.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of pods will be a list of xml string representations of the pods
+
+```js
+// e.g., default
+waClient.query('pi').then(function(qr) {
+  console.log(qr.pods())
+})
+
+// output (truncated)
+[
+  {
+    subpod: [ [subpod1...] ],
+    title: 'Input',
+    scanner: 'Identity',
+    id: 'Input',
+    position: '100',
+    error: 'false',
+    numsubpods: '1',
+    __parent: ...
+  },
+  ...
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  console.log(qr.pods(true))
+})
+
+// output (truncated)
+[
+  '<pod title="Input" scanner="Identity" id="Input" position="100" error="false" numsubpods="1">...</pod>',
+  ...
+]
 ```
 
 ---
 
 ## Roadmap
 
-The future of jKif Parser is managed through this repository's **Issues** &mdash; [view the roadmap here](https://github.com/jkif/parser/issues).
+The future of **wajs** is managed through this repository's **Issues** &mdash; [view the roadmap here](https://github.com/cfeusier/wolfram-alpha-api-js/issues).
 
-## Contributing to jKif Parser
+## Contributing to **wajs**
 
-We welcome contributions, but please read our [contribution guidelines](CONTRIBUTING.md) before submitting your work. The development requirements and instructions are below.
+I welcome contributions, but please submit an issue before beginning so that I don't duplicate your work. The development requirements and instructions are below.
 
 ## Development Requirements
 
-- Node 0.10.x
-- npm 2.x.x
-- Mocha
-- Chai
-- Jison
-- Bluebird
-- JSONFile
+**JavaScript Engine**:
+- node > 0.10.x
+
+**Package Manager**:
+- npm > 2.x.x
+
+**Global Packages**:
+- webpack
+
+**Project Package Dependencies**:
+- bluebird
+- cheerio
+- popsicle
+- traverse
+- xml2js
+
+**Development Package Dependencies**:
+- babel-core
+- babel-loader
+- babel-plugin-transform-runtime
+- babel-polyfill
+- babel-preset-es2015
+- babel-preset-stage-0
+- babel-runtime
+- watch
+- webpack-node-externals
 
 ### Installing Dependencies
 
@@ -300,7 +506,13 @@ Install Node (bundled with npm) using [Homebrew](http://brew.sh/):
 brew install node
 ```
 
-Install project and development dependencies using npm:
+Install global project dependencies using npm:
+
+```sh
+npm install -g webpack
+```
+
+Install all local project dependencies using npm:
 
 ```sh
 npm install
@@ -311,14 +523,32 @@ npm install
 After installing the above dependencies, tests can be run using the following command:
 
 ```sh
-npm test
+npm run test
 ```
+
+### Building
+
+For a one-off build, run the following command:
+
+```sh
+npm run build
+```
+
+For a continuous build on changes during development, run the following command:
+
+```sh
+npm run build:watch
+```
+
+---
 
 ## License
 
-jKif Parser - Lexical Analysis and Parsing of SUO-KIF into JavaScript Objects
+MIT LICENSE
 
-Copyright (C) 2015 Clark Feusier <cfeusier@gmail.com> - All Rights Reserved
+**wajs** -- JavaScript bindings for the Wolfram|Alpha web-service API
+
+Copyright (C) 2016 Clark Feusier <cfeusier@gmail.com> - All Rights Reserved
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -328,46 +558,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-#### Dependencies
-
-- [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) &mdash; parses XML to JavaScript objects
-- [bluebird](https://github.com/petkaantonov/bluebird) &mdash; creates a Promise-interface for query methods
-- [cheerio](https://github.com/cheeriojs/cheerio) &mdash; simple server-side DOM utility library
-- [popsicle](https://github.com/blakeembrey/popsicle) &mdash; utility for making server and browser HTTP requests
-- [traverse](https://github.com/substack/js-traverse) &mdash; utility for traversing JavaScript objects
-
----
-
-## Appendix
-
-#### SUO-KIF
-
-[SUO-KIF] [1] was derived from [KIF] [2] by [Adam Pease] [3] and [Ian Niles] [4] for the construction of [SUMO] [5]. KIF, the Knowledge Interchange Format, is an Erlang-based language used for the formal representation and interchange of knowledge. KIF and SUO-KIF have **declarative semantics** and are **logically complete**, contra languages like *Prolog* and *SQL*. SUO-KIF was designed primarily for the ***authoring*** of knowledge, which makes it more amenable to ontology design than vanilla KIF.
-
-[1]: http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf "SUO-KIF"
-[2]: https://www.cs.auckland.ac.nz/courses/compsci367s2c/resources/kif.pdf "KIF"
-[3]: http://www.adampease.org/professional/ "Adam Pease"
-[4]: https://www.linkedin.com/pub/ian-niles/2/1b6/a69 "Ian Niles"
-[5]: http://www.adampease.org/OP/ "SUMO"
-
-#### Ontologies and SUMO
-
-The market-wide move, from the *informal* taxonomies of the 'semantic web' to the *formal* ontologies of the new 'cognitive web', is a strong indicator &mdash; even small sets of axiomatized knowledge are more powerful than large bodies of informally structured data.
-
-**Why?** Formal knowledge can be used to generate new knowledge; informal specifications can do no such thing because there is a possibility for inconsistency in the specifications. If we can provide a consistent semantics to our concepts and data, then meanings are not dependent on a particular inference implementation &mdash; enter **maching learning**.
-
-If formal knowledge is good, than open formal knowledge is better, and more open formal knowledge is best. This is the reasoning that led me to choose SUO-KIF as the origin language for the **jKif Parser**.
-
-The largest formal public ontology in existence today, the **Suggested Upper Merged Ontology** (SUMO), is written in SUO-KIF. SUMO is the *only* formal ontology to be mapped to the complete WordNet lexicon. SUMO, and its domain-specific ontologies, consists of over 25,000 terms and more than 80,000 axioms. SUMO has been merged with millions of instance facts from YAGO (Wikipedia). Finally, SUMO is free and owned by the IEEE.
-
-I want to get SUMO into the hands of the world's engineers &mdash; JavaScript seemed like a logical choice for a target language on top of which to expose an API for querying and manipulating SUO-KIF (the next library jKif will release).
-
-#### Jison and Parser Generators
-
-[**Jison**](http://zaach.github.io/jison/docs/) is a JavaScript parser generator, based closely on the famous Yacc and Bison. Jison also includes a lexical analyzer that is very similar to Lex/Flex. Jison is probably most well-known for its use in generation of the parsers used in the CoffeeScript and handlebars.js compilers.
-
-Jison, like most parser generators, takes a lexical scanner and [**context-free grammar**](http://en.wikipedia.org/wiki/Context-free_grammar) as input, and spits out a parser that can be used to parse the langauge described by the input grammar.
-
-The generated parser algorithm is an LALR(1) **shift-reduce** algorithm &mdash; shifting tokens onto a parse stack until a rule is recognized, at which point the matching tokens are reduced to the result of a combination action described by the matched rule. This is a **bottom-up** approach to parsing, keeping a single look-ahead token, as described [here](http://dinosaur.compilertools.net/bison/bison_8.html#SEC68).
-
-#### [Back to Top](#) -->
+#### [Back to Top](#)

@@ -32,14 +32,16 @@ wa.query('pi', qOpts)
   //     console.log(value)
   //   })
   // })
-  console.log(res.pods())
+  // console.log(res.pods(true))
   // console.log(res.toJson())
   // console.log(res.rawXml())
-  // res.succeeded()
-  // res.failed()
-  // res.numPods()
-  // res.dataTypes()
-  // res.error()
+  // console.log(
+  //   res.succeeded(),
+  //   res.failed(),
+  //   res.numPods(),
+  //   res.dataTypes(),
+  //   res.error()
+  // )
   // console.log(res.rawXml())
   // console.log(res.pods()[0].rawXml())
   // console.log(res.pods()[1].getStates(true))
