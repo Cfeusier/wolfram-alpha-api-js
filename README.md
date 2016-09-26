@@ -113,6 +113,9 @@ waClient.query(queryString, queryOptions)
   - [**`<query-result>.toJson`**](#query-resulttojson)
   - [**`<query-result>.rawXml`**](#query-resultrawxml)
   - [**`<query-result>.pods`**](#query-resultpods)
+  - [**`<query-result>.assumptions`**](#query-resultassumptions)
+  - [**`<query-result>.sources`**](#query-resultsources)
+  - [**`<query-result>.warnings`**](#query-resultwarnings)
 
 #### wajs
 
@@ -269,6 +272,49 @@ var queryOptions = {
 
 }
 ```
+<!--
+// TODO:
+scantimeout
+The number of seconds to allow Wolfram|Alpha to compute results in the "scan" stage of processing. See the section "Timeouts and Asynchronous Behavior" for more details.
+
+Optional; defaults to 3.0.
+
+podtimeout
+The number of seconds to allow Wolfram|Alpha to spend in the "format" stage for any one pod. See the section "Timeouts and Asynchronous Behavior" for more details.
+
+Optional; defaults to 4.0.
+
+formattimeout
+The number of seconds to allow Wolfram|Alpha to spend in the "format" stage for the entire collection of pods. See the section "Timeouts and Asynchronous Behavior" for more details.
+
+Optional; defaults to 8.0.
+
+parsetimeout
+The number of seconds to allow Wolfram|Alpha to spend in the "parsing" stage of processing. See the section "Timeouts and Asynchronous Behavior" for more details.
+
+Optional; defaults to 5.0.
+
+reinterpret
+Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood. See the section "Some Miscellaneous URL Parameters" for more details.
+
+Optional; defaults to false.
+
+translation
+Whether to allow Wolfram|Alpha to try to translate simple queries into English. See the section "Some Miscellaneous URL Parameters" for more details.
+
+Optional; defaults to true.
+
+ignorecase
+Whether to force Wolfram|Alpha to ignore case in queries. See the section "Some Miscellaneous URL Parameters" for more details.
+
+Optional; defaults to false.
+
+sig
+A special signature that can be applied to guard against misuse of your AppID.
+
+Optional.
+-->
+
 
 #### \<query-result>
 
@@ -457,6 +503,117 @@ waClient.query('pi').then(function(qr) {
   '<pod title="Input" scanner="Identity" id="Input" position="100" error="false" numsubpods="1">...</pod>',
   ...
 ]
+```
+
+#### \<query-result>.assumptions
+
+#### `<query-result>.assumptions(xmlFormat: boolean): array<assumption>`
+
+This method return a list of `assumption` objects from the query result.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of assumptions will be a list of xml string representations of the assumptions
+
+```js
+// e.g., default
+waClient.query('pi').then(function(qr) {
+  console.log(qr.assumptions())
+})
+
+// output (truncated)
+[
+  {
+    value: [[...], [...], [...], [...], [...], [...]],
+    type: 'Clash',
+    word: 'pi',
+    template: 'Assuming "${word}" is ${desc1}. Use as ${desc2} instead',
+    count: '6',
+    __parent: ...
+  }
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  console.log(qr.assumptions(true))
+})
+
+// output (truncated)
+[
+  '<assumption type="Clash" word="pi" template="Assuming &quot;${word}&quot; is ${desc1}. Use as ${desc2} instead" count="6">...</assumption>',
+  ...
+]
+```
+
+#### \<query-result>.sources
+
+#### `<query-result>.sources(xmlFormat: boolean): array<source>`
+
+This method return a list of `source` objects from the query result.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of sources will be a list of xml string representations of each source object
+
+```js
+// e.g., default
+waClient.query('weather').then(function(qr) {
+  console.log(qr.sources())
+})
+
+// output (truncated)
+[
+  {
+    source: [[...], [...], [...], [...]],
+    count: '4'
+  },
+  ...
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  console.log(qr.sources(true))
+})
+
+// output (truncated)
+[
+  '<sources count="4">...</sources>',
+  ...
+]
+```
+
+#### \<query-result>.warnings
+
+#### `<query-result>.warnings(xmlFormat: boolean): array<warning>`
+
+This method return a list of `warning` objects from the query result.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of warnings will be a list of xml string representations of each warning object
+
+```js
+// e.g., default
+waClient.query('pi').then(function(qr) {
+  console.log(qr.warnings())
+})
+
+// output (truncated)
+undefined // (there are no warnings for this query result)
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  console.log(qr.warnings(true))
+})
+
+// output (truncated)
+undefined // (there are no warnings for this query result)
 ```
 
 ---
