@@ -1,6 +1,6 @@
 # `wajs` &mdash; Wolfram|Alpha via JS
 
-**wajs** provides JavaScript bindings for the [Wolfram|Alpha web-service API](http://products.wolframalpha.com/api/).
+**wajs** provides JavaScript bindings for the [Wolfram|Alpha web-service API](http://products.wolframalpha.com/api/). **wajs** exposes the Wolfram|Alpha web-service API via a small JavaScript library (Node.js environment). The **wajs** library also offers an interface for querying Wolfram|Alpha, and manipulating query results programmatically without needing to wrangle raw XML.
 
 [ ![Current Stable Release Version](https://img.shields.io/badge/version-0.0.13-blue.svg)](https://github.com/cfeusier/wolfram-alpha-api-js/releases)
 [ ![Current Stable npm Release](https://img.shields.io/badge/npm-install%20wajs-lightgrey.svg)](https://www.npmjs.com/package/wajs)
@@ -27,7 +27,16 @@
 ---
 ## Overview
 
-...
+Here is a list of the core features of **wajs**:
+
+- Full Wolfram|Alpha web-service API coverage
+- [Simple to use](#example-usage) 'out of the box', yet [easily configurable](#options)
+- Predictable promise interface for [query](#wajs-clientquery)
+- Powerful [utility API on query result](#query-result)
+- Access to [raw XML](#query-resultrawxml) at each level of query result
+- Access to [JSON representation](#query-resulttojson) at each level of query result
+
+If you have _directly_ consumed the Wolfram|Alpha web-service API, you might have appreciation for the features listed above. If you haven't yet interacted with the Wolfram|Alpha API, save yourself some pain and use **wajs**. [Installation instructions](#installation), [example usage](#example-usage), and [API reference](#api-reference) can be found below.
 
 ---
 
@@ -270,51 +279,48 @@ var queryOptions = {
   // default: '1.0'
   magnitude: '',
 
+  // scanTimeout
+  // string
+  // default: '3.0'
+  scanTimeout: '',
+
+  // podTimeout
+  // string
+  // default: '4.0'
+  podTimeout: '',
+
+  // parseTimeout
+  // string
+  // default: '5.0'
+  parseTimeout: '',
+
+  // formatTimeout
+  // string
+  // default: '8.0'
+  formatTimeout: '',
+
+  // reinterpret
+  // boolean -- if true, and there are no results for a query, Wolfram|Alpha
+  // can switch to a related query for which some results are available
+  // default: false
+  reinterpret: '',
+
+  // translation
+  // boolean -- if false, auto-translation of simple queries is turned off
+  // default: true
+  translation: '',
+
+  // ignoreCase
+  // boolean -- if true, case will not be significant for the given query
+  // default: false
+  ignoreCase: '',
+
+  // sig
+  // string -- used to sign and validate identity of request/response
+  // default: none
+  sig: ''
 }
 ```
-<!--
-// TODO:
-scantimeout
-The number of seconds to allow Wolfram|Alpha to compute results in the "scan" stage of processing. See the section "Timeouts and Asynchronous Behavior" for more details.
-
-Optional; defaults to 3.0.
-
-podtimeout
-The number of seconds to allow Wolfram|Alpha to spend in the "format" stage for any one pod. See the section "Timeouts and Asynchronous Behavior" for more details.
-
-Optional; defaults to 4.0.
-
-formattimeout
-The number of seconds to allow Wolfram|Alpha to spend in the "format" stage for the entire collection of pods. See the section "Timeouts and Asynchronous Behavior" for more details.
-
-Optional; defaults to 8.0.
-
-parsetimeout
-The number of seconds to allow Wolfram|Alpha to spend in the "parsing" stage of processing. See the section "Timeouts and Asynchronous Behavior" for more details.
-
-Optional; defaults to 5.0.
-
-reinterpret
-Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood. See the section "Some Miscellaneous URL Parameters" for more details.
-
-Optional; defaults to false.
-
-translation
-Whether to allow Wolfram|Alpha to try to translate simple queries into English. See the section "Some Miscellaneous URL Parameters" for more details.
-
-Optional; defaults to true.
-
-ignorecase
-Whether to force Wolfram|Alpha to ignore case in queries. See the section "Some Miscellaneous URL Parameters" for more details.
-
-Optional; defaults to false.
-
-sig
-A special signature that can be applied to guard against misuse of your AppID.
-
-Optional.
--->
-
 
 #### \<query-result>
 
@@ -615,6 +621,8 @@ waClient.query('pi').then(function(qr) {
 // output (truncated)
 undefined // (there are no warnings for this query result)
 ```
+
+<!-- TODO: <pod>, <subpod>, <assumption> interfaces -->
 
 ---
 

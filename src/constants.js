@@ -9,7 +9,12 @@ const queryMap = {
   podState: 'podstate',
   maxWidth: 'maxwidth',
   plotWidth: 'plotWidth',
-  magnitude: 'mag'
+  magnitude: 'mag',
+  scanTimeout: 'scantimeout',
+  podTimeout: 'podtimeout',
+  parseTimeout: 'parsetimeout',
+  formatTimeout: 'formattimeout',
+  ignoreCase: 'ignorecase'
 }
 
 const defaultQueryOptions = {

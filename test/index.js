@@ -23,6 +23,14 @@ let qOpts = {
   // maxWidth: '', // (500)
   // plotWidth: '200', // (200)
   // magnitude: '4.0', // (1.0)
+  // scanTimeout: '1.0' //(3.0)
+  // podTimeout: '1.0' //(4.0)
+  // parseTimeout: '1.0', //(5.0)
+  // formatTimeout: '1.0' //(8.0)
+  // reinterpret: true,
+  // translation: false,
+  // ignoreCase: true,
+  // sig: 'heyheyhey'
 
 }
 wa.query('pi', qOpts)
@@ -33,7 +41,7 @@ wa.query('pi', qOpts)
   //   })
   // })
   // console.log(res.pods(true))
-  // console.log(res.toJson())
+  // console.log(res)
   // console.log(res.rawXml())
   // console.log(
   //   res.succeeded(),
@@ -66,7 +74,7 @@ wa.query('pi', qOpts)
   // console.log(res.rawXml())
   // console.log(res.sources())
   // console.log(res.sources(true))
-  console.log(res.warnings())
+  // console.log(res.warnings())
   // console.log(res.warnings(true))
 
 })
