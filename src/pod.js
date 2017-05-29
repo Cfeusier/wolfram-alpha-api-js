@@ -33,7 +33,7 @@ function failed() {
 }
 
 function succeeded() {
-  return !podFailed.call(this)
+  return !failed.call(this)
 }
 
 function numSubPods() {

@@ -2,7 +2,7 @@
 
 **wajs** provides JavaScript bindings for the [Wolfram|Alpha web-service API](http://products.wolframalpha.com/api/). **wajs** exposes the Wolfram|Alpha web-service API via a small JavaScript library (Node.js environment). The **wajs** library also offers an interface for querying Wolfram|Alpha, and manipulating query results programmatically without needing to wrangle raw XML.
 
-[ ![Current Stable Release Version](https://img.shields.io/badge/version-0.0.13-blue.svg)](https://github.com/cfeusier/wolfram-alpha-api-js/releases)
+[ ![Current Stable Release Version](https://img.shields.io/badge/version-0.0.17-blue.svg)](https://github.com/cfeusier/wolfram-alpha-api-js/releases)
 [ ![Current Stable npm Release](https://img.shields.io/badge/npm-install%20wajs-lightgrey.svg)](https://www.npmjs.com/package/wajs)
 
 > <sub>__Created by [Clark Feusier](http://clarkfeusier.com/pages/about)__</sub>
@@ -125,6 +125,7 @@ waClient.query(queryString, queryOptions)
   - [**`<query-result>.assumptions`**](#query-resultassumptions)
   - [**`<query-result>.sources`**](#query-resultsources)
   - [**`<query-result>.warnings`**](#query-resultwarnings)
+- [**`<pod>`**](#pod)
 
 #### wajs
 
@@ -622,7 +623,317 @@ waClient.query('pi').then(function(qr) {
 undefined // (there are no warnings for this query result)
 ```
 
-<!-- TODO: <pod>, <subpod>, <assumption> interfaces -->
+#### \<pod>
+
+Each `<query-result>` provides a `.pods()` method to access the `<query-result>` pods, if any. Each `<pod>` provides the following API.
+
+#### \<pod>.succeeded
+
+#### `<pod>.succeeded(): boolean`
+
+This method returns true if the pod was loaded successfully from *Wolfram|Alpha*.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.succeeded())
+})
+
+// output (truncated)
+true // this pod was fetched successfully
+```
+
+#### \<pod>.failed
+
+#### `<pod>.failed(): boolean`
+
+This method returns true if the pod was *not* successfully fetched from *Wolfram|Alpha*.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.failed())
+})
+
+// output (truncated)
+false // this pod was fetched successfully
+```
+
+#### \<pod>.getTitle
+
+#### `<pod>.getTitle(): string`
+
+This method returns the title of the pod, represented as a string.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getTitle())
+})
+
+// output (truncated)
+'Example Pod Title'
+```
+
+#### \<pod>.numSubPods
+
+#### `<pod>.numSubPods(): number = 0`
+
+This method returns the number of `<subPods>` contained by the `<pod>`.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.numSubPods())
+})
+
+// output (truncated)
+2
+```
+
+#### \<pod>.rawXml
+
+#### `<pod>.rawXml(): xml-string`
+
+This method returns the raw XML string representation of the `<pod>`.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.rawXml())
+})
+```
+
+```xml
+<!-- output (truncated) -->
+<pod title='Input'>...</pod>
+```
+
+#### \<pod>.getScanner
+
+#### `<pod>.getScanner(): string`
+
+This method returns a string representation of the `<pod>'s` scanner.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getScanner())
+})
+
+// output (truncated)
+'Numeric'
+```
+
+#### \<pod>.getPosition
+
+#### `<pod>.getPosition(): number = 0`
+
+This method returns a number representation of the `<pod>'s` position in the `<query-result>`.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getPosition())
+})
+
+// output (truncated)
+1
+```
+
+#### \<pod>.asyncEndpoint
+
+#### `<pod>.asyncEndpoint(): string`
+
+This method returns a string representation of the `<pod>'s` asynchronous url -- the endpoint for asynchronously fetching the `<pod>'s` data, assuming the query used `async=true`.
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.asyncEndpoint())
+})
+
+// output (truncated)
+'http://www1.wolframalpha.com/api/v2/asyncPod.jsp?id=MSPa1071c679e3ea1d0h94h00002h3ggc950ehaibf9&s=13'
+```
+
+#### \<pod>.subPods
+
+#### `<pod>.subPods(xmlFormat: boolean): array<subpod>`
+
+This method returns a list of `<subpod>s` from the pod.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of subpods will be a list of xml string representations of each subpod object
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.subPods())
+})
+
+// output (truncated)
+[
+  {
+    "title" : "",
+    "img" : {
+      "src" : "http:\/\/www4c.wolframalpha.com\/Calculate\/MSP\/MSP4541i6ff0cbeghe4a6a0000248ahgicidag8e12?MSPStoreType=image\/gif&s=61",
+      "alt" : "",
+      "title" : "",
+      "width" : 300,
+      "height" : 56
+    },
+      "plaintext" : ""
+  }
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.subPods(true))
+})
+
+// output (truncated)
+[
+  '<subpod title=''...>...</subpod>'
+]
+```
+
+#### \<pod>.getStates
+
+#### `<pod>.getStates(xmlFormat: boolean): array<state>`
+
+This method returns a list of `<state>s` from the pod.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of state objects will be a list of xml string representations of each state object
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getStates())
+})
+
+// output (truncated)
+[
+  {
+    "name" : "Fraction form",
+    "input" : "ContinuedFraction__Fraction form"
+  }
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getStates(true))
+})
+```
+
+```xml
+// output (truncated)
+<states count='1'>
+  <state name='More'
+    input='AlternativeRepresentations:MathematicalFunctionIdentityData__More'
+  />
+</states>
+```
+
+#### \<pod>.getInfos
+
+#### `<pod>.getInfos(xmlFormat: boolean): array<info>`
+
+This method returns a list of `<info>s` from the pod.
+
+- `xmlFormat`:
+  - type: boolean
+  - _optional_
+  - default: `false`
+  - if `true`, the list of info objects will be a list of xml string representations of each info object
+
+```js
+// e.g.,
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getInfos())
+})
+
+// output (truncated)
+[
+  {
+    "text" : "(n\nm) is the binomial coefficient",
+    "img" : {
+      "src" : "http:\/\/www4b.wolframalpha.com\/Calculate\/MSP\/MSP22591ca2276efe0853cd000045fid320b029578h?MSPStoreType=image\/gif&s=61",
+      "alt" : "(n\nm) is the binomial coefficient",
+      "title" : "(n\nm) is the binomial coefficient",
+      "width" : "204",
+      "height" : "36"
+    },
+    "links" : [
+      {
+        "url" : "http:\/\/reference.wolfram.com\/language\/ref\/Binomial.html",
+        "text" : "Documentation",
+        "title" : "Mathematica"
+      },
+      {
+        "url" : "http:\/\/functions.wolfram.com\/GammaBetaErf\/Binomial",
+        "text" : "Properties",
+        "title" : "Wolfram Functions Site"
+      },
+      {
+        "url" : "http:\/\/mathworld.wolfram.com\/BinomialCoefficient.html",
+        "text" : "Definition",
+        "title" : "MathWorld"
+      }
+    ]
+  }
+]
+
+// e.g., xmlFormat is true
+waClient.query('pi').then(function(qr) {
+  const [pod] = qr.pods()
+  console.log(pod.getInfos(true))
+})
+```
+
+```xml
+// output (truncated)
+<infos count='1'>
+  <info text='i is the imaginary unit'>
+    <img src='http://www5b.wolframalpha.com/Calculate/MSP/MSP11872374eggi4a3i61a900000eg99g28e5669i23?MSPStoreType=image/gif&amp;s=32'
+      alt='i is the imaginary unit'
+      title='i is the imaginary unit'
+      width='147'
+      height='18'
+    />
+    <link url='http://reference.wolfram.com/language/ref/I.html'
+      text='Documentation'
+      title='Documentation'
+    />
+    <link url='http://mathworld.wolfram.com/i.html'
+      text='Definition'
+      title='MathWorld'
+    />
+  </info>
+</infos>
+```
+
+<!-- TODO:  <subpod>, <assumption> interfaces -->
 
 ---
 
